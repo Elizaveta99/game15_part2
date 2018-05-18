@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,10 +19,10 @@ namespace game_15
     public partial class Form1 : Form
     {
         private Game15 g = new Game15();
-        private DateTime sttime;
+        private DateTime sttime = DateTime.Now;
         private string name;
         private int count;
-        public static List<result> resList = new List<result>();
+        public List<result> resList = new List<result>();
 
         public Form1()
         {
@@ -31,7 +31,7 @@ namespace game_15
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            using (FileStream fr = new FileStream("result.dat", FileMode.OpenOrCreate))
+            using (FileStream fr = new FileStream("result.dat", FileMode.Open))
             {
                 BinaryFormatter bf = new BinaryFormatter();
                 resList = (List<result>)bf.Deserialize(fr);
@@ -74,12 +74,11 @@ namespace game_15
                 count++;
             }
             tbx1.Text = count.ToString();
-            tbx1.Text = (DateTime.Now - sttime).ToString(@"mm\:ss");
+            tbx2.Text = (DateTime.Now - sttime).ToString(@"mm\:ss");
             Show_game();
             if (isBuilt())
             {
-                timer.Stop();
-                MessageBox.Show("Game is built!" + "\r\n" + "Amount of shifts : " + count.ToString() + "\r\n" + "Time : " + (DateTime.Now - sttime).ToString(@"mm\:ss"));
+                Built();
             }
         }  
 
@@ -123,19 +122,13 @@ namespace game_15
                 MessageBox.Show("This game can't be built!");
             if (isBuilt())
             {
-                timer.Stop();
-                result res = new result();
-                res.Name = name;
-                res.StartTime = sttime;
-                res.GameTime = DateTime.Now - sttime;
-                res.Shifts = count;
-                resList.Add(res);
-                MessageBox.Show("Game is built!" + "\r\n"  +"Game number " + resList.Count.ToString() +  "\r\nAmount of shifts : " + count.ToString() + "\r\n" + "Time : " + (DateTime.Now - sttime).ToString(@"mm\:ss"));
+                Built();
             }
         }
 
         private void newGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            dgvGame15.Enabled = true;
             name = textBox1.Text;
             int[] a = new int[g.SIZE * g.SIZE];
             a = g.startGame();
@@ -144,6 +137,7 @@ namespace game_15
 
         private void retryToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            dgvGame15.Enabled = true;
             int[] a = new int[g.SIZE * g.SIZE];
             a = g.Read();
             int cnt = 0;
@@ -167,13 +161,32 @@ namespace game_15
             F2.Show();
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void Serialize()
         {
             using (FileStream fs = new FileStream("result.dat", FileMode.OpenOrCreate))
             {
                 BinaryFormatter bf = new BinaryFormatter();
                 bf.Serialize(fs, resList);
             }
+        }
+
+        private void Built()
+        {
+            dgvGame15.Enabled = false;
+            timer.Stop();
+            result res = new result();
+            res.Name = name;
+            res.StartTime = sttime;
+            res.GameTime = DateTime.Now - sttime;
+            res.Shifts = count;
+            resList.Add(res);
+            //Serialize();
+            MessageBox.Show("Game is built!" + "\r\nAmount of shifts : " + count.ToString() + "\r\n" + "Time : " + (DateTime.Now - sttime).ToString(@"mm\:ss"));
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Serialize();
         }
     }
 }
