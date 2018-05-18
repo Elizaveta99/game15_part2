@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -23,8 +23,8 @@ namespace game_15
 
         private void button5_Click(object sender, EventArgs e)
         {
+            Hide();
             Application.OpenForms[0].Show();
-            Application.OpenForms[1].Hide();
         }
 
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
@@ -38,7 +38,7 @@ namespace game_15
             {
                 CompareGameTime comp = new CompareGameTime();
                 resList.Sort(comp);
-                Print(false);
+                Print();
             }
             else
             {
@@ -52,7 +52,7 @@ namespace game_15
             {
                 CompareShifts comp = new CompareShifts();
                 resList.Sort(comp);
-                Print(false);
+                Print();
             }
             else
             {
@@ -66,7 +66,7 @@ namespace game_15
             {
                 CompareTime comp = new CompareTime();
                 resList.Sort(comp);
-                Print(true);
+                Print();
             }
             else
             {
@@ -74,54 +74,43 @@ namespace game_15
             }
         }
 
-        private void Print(bool flag)
+        private void Print()
         {
             textBox1.Clear();
-            textBox1.AppendText("Name           Game time           Start time           Shifts");
-
-            if (!flag)
+            textBox1.AppendText("Name           Game time              Start time                            Shifts");
+            for (int i = 0; i < Math.Min(10, resList.Count); i++)
             {
-                for (int i = 0; i < Math.Min(10, resList.Count); i++)
-                {
-                    String text = resList[i].Name + "           " + resList[i].GameTime.ToString(@"mm\:ss") + "                " + resList[i].StartTime.ToString(@"hh\:mm\:ss") + "                " + resList[i].Shifts.ToString();
-                    textBox1.AppendText(Environment.NewLine);
-                    textBox1.AppendText(text);
-                }
-            }
-            else
-            {
-                for (int i = Math.Min(10, resList.Count) - 1; i > -1; i--)
-                {
-                    String text = resList[i].Name + "           " + resList[i].GameTime.ToString(@"mm\:ss") + "                " + resList[i].StartTime.ToString(@"hh\:mm\:ss") + "                " + resList[i].Shifts.ToString();
-                    textBox1.AppendText(Environment.NewLine);
-                    textBox1.AppendText(text);
-                }
+                String text = resList[i].Name + "           " + resList[i].GameTime.ToString(@"mm\:ss") + "           " + resList[i].StartTime.ToString(@"dd\/MM\/yyyy\; HH\:mm\:ss") + "                " + resList[i].Shifts.ToString();
+                textBox1.AppendText(Environment.NewLine);
+                textBox1.AppendText(text);
             }
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //формат даты указать на форме
             DateTime time;
-            if (DateTime.TryParse(textBox2.Text, out time))
+            if (resList != null && resList.Count != 0)
             {
-                if (resList != null && resList.Count != 0)
+                if (DateTime.TryParse(textBox2.Text, out time))
                 {
                     CompareTime comp = new CompareTime();
                     resList.Sort(comp);
-                    for (int i = 0; i < resList.Count; i++)
-                        if (resList[i].StartTime >= time)
-                            resList.RemoveAt(i); //или запомнить номер 1-го неподходящего и removerange
+                    for (int i = resList.Count - 1; i > -1 ; i--)
+                        if (resList[i].StartTime <= time)
+                            resList.RemoveAt(i);
+                    textBox1.Clear();
+                    textBox1.AppendText("Name           Game time              Start time                            Shifts");
                 }
                 else
                 {
-                    MessageBox.Show("There are no results yet!");
+                    MessageBox.Show("Incorrect time!");
                 }
             }
             else
             {
-                MessageBox.Show("Incorrect time!");
+                MessageBox.Show("There are no results yet!");
             }
         }
     }
 }
+
