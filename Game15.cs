@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,15 +45,16 @@ namespace game_15
 
         public void genPermutations(ref int[] a)
         {
-            //for (int i = n - 1; i > -1; i--)
-            //{
-            //    Random rnd = new Random();
-            //    int j = rnd.Next(i + 1);
-            //    int temp = a[i];
-            //    a[i] = a[j];
-            //    a[j] = temp;
-            //    Thread.Sleep(20);
-            //}
+            for (int i = 1; i < 4; i++)
+            //for (int i = 1; i < 16; i++)
+            {
+                Random rnd = new Random();
+                int j = rnd.Next(i + 1);
+                int temp = a[i];
+                a[i] = a[j];
+                a[j] = temp;
+                Thread.Sleep(20);
+            }
         }
 
         public bool no_desicion(int[] a)
@@ -74,7 +75,7 @@ namespace game_15
         public void change(int a, int b, int c, int d)
         {
             table[a, b] = table[c, d];
-            table[c, d] = 0;
+            table[c, d] = 16;
         }
 
         public void Save_game()
